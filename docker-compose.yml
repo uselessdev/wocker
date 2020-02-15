@@ -1,0 +1,27 @@
+version: "2.3"
+
+services:
+  base:
+    build:
+      context: .
+      target: development
+    volumes:
+      - ./config/upload.ini:/usr/local/etc/php/conf.d/upload.ini
+      - ./wp-content:/var/www/html/wp-content
+
+  app:
+    extends: base
+    container_name: site
+    env_file: .env
+    ports:
+      - 4000:80
+    # add conditions here to wait for database has up, it's a slow process
+    depends_on:
+      - database
+
+  database:
+    image: mariadb:10.5-bionic
+    container_name: site-database
+    env_file: .env
+    volumes:
+      - ./database:/var/lib/mysql
